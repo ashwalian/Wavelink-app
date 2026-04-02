@@ -1,25 +1,5 @@
 {
-  "name": "kit-expo-minimal",
-  "displayName": "Minimal Mobile Kit Expo example",
-  "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
-  "usecase": "Mobile",
-  "keywords": [
-    "expo",
-    "mobile-wallet-adapter",
-    "react-native",
-    "solana-kit"
-  ],
-  "create-solana-dapp": {
-    "instructions": [
-      "To buld the Android app locally, run this:",
-      "+{pm} run android"
-    ],
-    "versions:": {
-      "adb": "33.0.0"
-    }
-  },
-  "main": "./index.js",
-  "version": "1.0.0",
+  "name": "myapp",
   "scripts": {
     "android": "expo run:android",
     "android:build": "expo prebuild -p android",
@@ -35,6 +15,17 @@
     "start": "expo start",
     "web": "expo start --web"
   },
+  "displayName": "Minimal Mobile Kit Expo example",
+  "description": "A minimal template for building a Solana mobile app with Expo, React Native, and Solana Kit.",
+  "usecase": "Mobile",
+  "keywords": [
+    "expo",
+    "mobile-wallet-adapter",
+    "react-native",
+    "solana-kit"
+  ],
+  "main": "./index.js",
+  "version": "1.0.0",
   "dependencies": {
     "@expo/metro-runtime": "~55.0.6",
     "@expo/vector-icons": "^15.0.3",
@@ -62,6 +53,7 @@
     "expo-system-ui": "~55.0.10",
     "expo-web-browser": "~55.0.10",
     "js-base64": "^3.7.8",
+    "motion": "^12.38.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
@@ -81,5 +73,6 @@
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
