@@ -6,10 +6,11 @@ import { AppProviders } from '@/components/app-providers'
 export default function RootLayout() {
   return (
     <AppProviders>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </AppProviders>
   )
 }
