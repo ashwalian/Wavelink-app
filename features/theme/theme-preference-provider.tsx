@@ -45,7 +45,9 @@ export function ThemePreferenceProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof document === 'undefined') return
-    document.body.style.backgroundColor = isDarkMode ? '#0a0a0a' : '#ffffff'
+    const bg = isDarkMode ? '#0a0a0a' : '#ffffff'
+    document.body.style.backgroundColor = bg
+    document.documentElement.style.backgroundColor = bg
   }, [isDarkMode])
 
   const value = useMemo(

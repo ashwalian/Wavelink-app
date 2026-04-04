@@ -1,11 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemePreference } from '@/features/theme/theme-preference-provider';
 
 export default function PayAndFlyScreen() {
+  const { isDarkMode } = useThemePreference();
+  const bg = isDarkMode ? '#0a0a0a' : '#ffffff';
+  const titleC = isDarkMode ? '#ffffff' : '#0f172a';
+  const subC = isDarkMode ? '#9ca3af' : '#64748b';
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Pay and Fly</Text>
-      <Text style={styles.subtitle}>Book your flights and pay with crypto.</Text>
+    <View style={[styles.container, { backgroundColor: bg }]}>
+      <Text style={[styles.title, { color: titleC }]}>Pay and Fly</Text>
+      <Text style={[styles.subtitle, { color: subC }]}>Book your flights and pay with crypto.</Text>
       <View style={styles.placeholder}>
         <Text style={styles.placeholderText}>Coming Soon</Text>
       </View>
@@ -16,7 +22,6 @@ export default function PayAndFlyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -24,12 +29,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#ffffff',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9ca3af',
     textAlign: 'center',
     marginBottom: 32,
   },

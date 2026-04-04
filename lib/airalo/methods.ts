@@ -1,5 +1,7 @@
 import { airaloPartnersGetJson, type AiraloRequestOptions } from '@/lib/airalo/fetch-json'
 import type {
+  AiraloBalanceResponse,
+  AiraloNotificationsOptInResponse,
   AiraloPackagesResponse,
   AiraloSimPackagesResponse,
   AiraloSimsResponse,
@@ -98,6 +100,30 @@ export function getAiraloSimUsage(
   if (!trimmed) throw new Error('simIccid is required')
   return airaloPartnersGetJson<AiraloSimUsageResponse>(
     `/v2/sims/${encodeURIComponent(trimmed)}/usage`,
+    undefined,
+    options,
+  )
+}
+
+/**
+ * GET /v2/balance
+ * Account balance / credit overview. If there is no account, `accounts` may be an empty array per docs.
+ */
+export function getAiraloBalance(
+  options?: AiraloRequestOptions,
+): Promise<AiraloBalanceResponse> {
+  return airaloPartnersGetJson<AiraloBalanceResponse>('/v2/balance', undefined, options)
+}
+
+/**
+ * GET /v2/notifications/opt-in
+ * Current webhook opt-in details (low data, credit limit, or async orders — same path; response reflects your registration).
+ */
+export function getAiraloNotificationsOptIn(
+  options?: AiraloRequestOptions,
+): Promise<AiraloNotificationsOptInResponse> {
+  return airaloPartnersGetJson<AiraloNotificationsOptInResponse>(
+    '/v2/notifications/opt-in',
     undefined,
     options,
   )

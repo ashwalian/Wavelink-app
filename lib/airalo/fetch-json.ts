@@ -1,5 +1,6 @@
-import { AIRALO_PARTNERS_BASE_URL, getAiraloAuthHeaders } from '@/lib/airalo/config'
+import { getAiraloAuthHeaders } from '@/lib/airalo/config'
 import { AiraloPartnersApiError } from '@/lib/airalo/errors'
+import { buildAiraloRequestUrl } from '@/lib/airalo/request-url'
 
 export type AiraloRequestOptions = {
   /** Override bearer token (e.g. tests). */
@@ -7,31 +8,19 @@ export type AiraloRequestOptions = {
   signal?: AbortSignal
 }
 
-function buildUrl(path: string, query?: Record<string, string | number | undefined | null>): string {
-  const base = AIRALO_PARTNERS_BASE_URL.endsWith('/')
-    ? AIRALO_PARTNERS_BASE_URL
-    : `${AIRALO_PARTNERS_BASE_URL}/`
-  const url = new URL(path.replace(/^\//, ''), base)
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
-      if (value === undefined || value === null || value === '') continue
-      url.searchParams.set(key, String(value))
-    }
-  }
-  return url.toString()
-}
-
 export async function airaloPartnersGetJson<T>(
   path: string,
   query?: Record<string, string | number | undefined | null>,
   options?: AiraloRequestOptions,
 ): Promise<T> {
-  const url = buildUrl(path, query)
+  const url = buildAiraloRequestUrl(path, query)
+  const headers = await getAiraloAuthHeaders(
+    options?.accessToken ? { accessToken: options.accessToken } : undefined,
+  )
+
   const res = await fetch(url, {
     method: 'GET',
-    headers: getAiraloAuthHeaders(
-      options?.accessToken ? { accessToken: options.accessToken } : undefined,
-    ),
+    headers,
     signal: options?.signal,
   })
 

@@ -3,38 +3,47 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import TelephoneIcon from '@/components/icons/TelephoneIcon';
 import MailFilledIcon from '@/components/icons/MailFilledIcon';
 import QuestionMark from '@/components/icons/QuestionMark';
+import { useThemePreference } from '@/features/theme/theme-preference-provider';
 
 export default function HelpScreen() {
+  const { isDarkMode } = useThemePreference();
+  const bg = isDarkMode ? '#0a0a0a' : '#ffffff';
+  const headingC = isDarkMode ? '#ffffff' : '#0f172a';
+  const iconC = isDarkMode ? '#ffffff' : '#0f172a';
+  const cardBg = isDarkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc';
+  const cardBorder = isDarkMode ? 'rgba(255,255,255,0.05)' : '#e2e8f0';
+  const descC = isDarkMode ? '#9ca3af' : '#64748b';
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: bg }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.heading}>Help Center</Text>
+        <Text style={[styles.heading, { color: headingC }]}>Help Center</Text>
         <View style={styles.helpList}>
-          <View style={styles.helpCard}>
-            <TelephoneIcon size={32} color="#ffffff" />
+          <View style={[styles.helpCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+            <TelephoneIcon size={32} color={iconC} />
             <View style={styles.helpTextContainer}>
-              <Text style={styles.helpTitle}>Contact Tech Support</Text>
-              <Text style={styles.helpDescription}>
+              <Text style={[styles.helpTitle, { color: headingC }]}>Contact Tech Support</Text>
+              <Text style={[styles.helpDescription, { color: descC }]}>
                 24/7 technical assistance for connectivity issues.
               </Text>
             </View>
           </View>
 
-          <View style={styles.helpCard}>
-            <MailFilledIcon size={32} color="#ffffff" />
+          <View style={[styles.helpCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+            <MailFilledIcon size={32} color={iconC} />
             <View style={styles.helpTextContainer}>
-              <Text style={styles.helpTitle}>Contact via Email</Text>
-              <Text style={styles.helpDescription}>
+              <Text style={[styles.helpTitle, { color: headingC }]}>Contact via Email</Text>
+              <Text style={[styles.helpDescription, { color: descC }]}>
                 Send us an email and we'll reply within 24 hours.
               </Text>
             </View>
           </View>
 
-          <View style={styles.helpCard}>
-            <QuestionMark size={32} color="#ffffff" />
+          <View style={[styles.helpCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+            <QuestionMark size={32} color={iconC} />
             <View style={styles.helpTextContainer}>
-              <Text style={styles.helpTitle}>FAQ</Text>
-              <Text style={styles.helpDescription}>
+              <Text style={[styles.helpTitle, { color: headingC }]}>FAQ</Text>
+              <Text style={[styles.helpDescription, { color: descC }]}>
                 Find answers to common questions about eSIMs.
               </Text>
             </View>
@@ -48,7 +57,6 @@ export default function HelpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
   },
   scrollContent: {
     padding: 20,
@@ -57,7 +65,6 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#ffffff',
     marginBottom: 20,
     letterSpacing: 0.5,
   },
@@ -68,10 +75,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
     gap: 16,
   },
   helpTextContainer: {
@@ -80,12 +85,10 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#ffffff',
     marginBottom: 4,
   },
   helpDescription: {
     fontSize: 13,
-    color: '#9ca3af',
     lineHeight: 18,
   },
 });

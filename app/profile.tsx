@@ -29,7 +29,7 @@ function shortAddress(addr: string) {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { isDarkMode, setDarkMode, toggleDarkMode } = useThemePreference();
+  const { isDarkMode, setDarkMode } = useThemePreference();
   const { account, connect, disconnect } = useMobileWallet();
   const webWallet = useWebSolanaWallet();
   const [walletBusy, setWalletBusy] = useState(false);
@@ -97,7 +97,7 @@ export default function ProfileScreen() {
 
         {/* Section 1: Account */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={[styles.sectionTitle, !isDarkMode && styles.sectionTitleLight]}>Account</Text>
           <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
               <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Account Settings</Text>
@@ -158,7 +158,7 @@ export default function ProfileScreen() {
 
         {/* Section 2: Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Info</Text>
+          <Text style={[styles.sectionTitle, !isDarkMode && styles.sectionTitleLight]}>Info</Text>
           <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
               <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Info about Airalo</Text>
@@ -177,12 +177,7 @@ export default function ProfileScreen() {
           <Text style={[styles.sectionTitle, !isDarkMode && styles.sectionTitleLight]}>Application</Text>
           <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
-              <Pressable
-                style={styles.appearanceLeft}
-                onPress={toggleDarkMode}
-                accessibilityRole="button"
-                accessibilityLabel="Toggle appearance"
-              >
+              <View style={styles.appearanceLeft} accessibilityLabel="Appearance">
                 {isDarkMode ? (
                   <MoonIcon size={24} color="#4f46e5" />
                 ) : (
@@ -191,10 +186,10 @@ export default function ProfileScreen() {
                 <View style={{ marginLeft: 12 }}>
                   <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Appearance</Text>
                   <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>
-                    {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                    {isDarkMode ? 'Dark' : 'Light'}
                   </Text>
                 </View>
-              </Pressable>
+              </View>
               <Switch
                 value={isDarkMode}
                 onValueChange={setDarkMode}
@@ -204,39 +199,6 @@ export default function ProfileScreen() {
                 style={Platform.OS === 'web' ? styles.switchWeb : undefined}
               />
             </View>
-            {Platform.OS === 'web' && (
-              <View
-                style={[
-                  styles.themeWebRow,
-                  {
-                    borderTopColor: isDarkMode ? 'rgba(255,255,255,0.08)' : '#e2e8f0',
-                  },
-                ]}
-              >
-                <Pressable
-                  onPress={() => setDarkMode(true)}
-                  style={[
-                    styles.themeWebChip,
-                    isDarkMode ? styles.themeWebChipActiveDark : styles.themeWebChipIdleDark,
-                  ]}
-                >
-                  <Text style={[styles.themeWebChipText, isDarkMode && styles.themeWebChipTextOnDark]}>
-                    Dark
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setDarkMode(false)}
-                  style={[
-                    styles.themeWebChip,
-                    !isDarkMode ? styles.themeWebChipActiveLight : styles.themeWebChipIdleLight,
-                  ]}
-                >
-                  <Text style={[styles.themeWebChipText, !isDarkMode && styles.themeWebChipTextOnLight]}>
-                    Light
-                  </Text>
-                </Pressable>
-              </View>
-            )}
           </View>
           <Text style={[styles.versionText, { color: isDarkMode ? '#6b7280' : '#94a3b8' }]}>Version {appVersion}</Text>
         </View>
@@ -324,47 +286,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
     gap: 12,
-  },
-  themeWebRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  themeWebChip: {
-    paddingVertical: 10,
-    paddingHorizontal: 28,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  themeWebChipActiveDark: {
-    backgroundColor: '#4f46e5',
-    borderColor: '#4f46e5',
-  },
-  themeWebChipIdleDark: {
-    backgroundColor: 'transparent',
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  themeWebChipActiveLight: {
-    backgroundColor: '#4f46e5',
-    borderColor: '#4f46e5',
-  },
-  themeWebChipIdleLight: {
-    backgroundColor: 'transparent',
-    borderColor: '#cbd5e1',
-  },
-  themeWebChipText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#94a3b8',
-  },
-  themeWebChipTextOnDark: {
-    color: '#ffffff',
-  },
-  themeWebChipTextOnLight: {
-    color: '#ffffff',
   },
   appearanceLeft: {
     flexDirection: 'row',

@@ -60,3 +60,53 @@ export type AiraloSimUsageResponse = {
   data: AiraloSimUsageData
   meta: { message: string }
 }
+
+/** GET /v2/balance — shape may vary; docs: empty accounts when none. */
+export type AiraloBalanceResponse = {
+  data: {
+    balances?: unknown
+    accounts?: unknown[]
+    [key: string]: unknown
+  }
+  meta: { message: string }
+}
+
+/** GET /v2/notifications/opt-in — which webhook types you are opted into. */
+export type AiraloWebhookNotificationType =
+  | 'webhook_low_data'
+  | 'webhook_credit_limit'
+  | 'async_orders'
+
+export type AiraloNotificationsOptInResponse = {
+  data: {
+    notification: {
+      type: AiraloWebhookNotificationType
+      contact_point: string
+    }
+  }
+  meta: { message: string }
+}
+
+/** Example async-order webhook POST body (partial). */
+export type AiraloAsyncOrderWebhookPayload = {
+  request_id?: string
+  reason?: string
+  sims?: unknown
+  [key: string]: unknown
+}
+
+/** Example low-data webhook POST body (partial). */
+export type AiraloLowDataWebhookPayload = {
+  level?: '1days' | '3days' | '75%' | '90%'
+  package_name?: string
+  remaining_percentage?: number
+  iccid?: string
+  [key: string]: unknown
+}
+
+/** Example credit-limit webhook POST body (partial). */
+export type AiraloCreditLimitWebhookPayload = {
+  message?: string
+  remaining?: number
+  [key: string]: unknown
+}

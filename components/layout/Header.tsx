@@ -4,25 +4,30 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BellIcon from '@/components/icons/BellIcon';
 import UserIcon from '@/components/icons/UserIcon';
+import { useThemePreference } from '@/features/theme/theme-preference-provider';
 
 export function Header() {
   const router = useRouter();
+  const { isDarkMode } = useThemePreference();
+  const fg = isDarkMode ? '#ffffff' : '#0f172a';
+  const border = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.08)';
+  const iconBg = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.06)';
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.logo}>Airalo</Text>
+    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: isDarkMode ? '#0a0a0a' : '#ffffff' }]}>
+      <View style={[styles.container, { borderBottomColor: border }]}>
+        <Text style={[styles.logo, { color: fg }]}>Airalo</Text>
         <View style={styles.icons}>
-          <Pressable style={styles.iconButton}>
-            <BellIcon size={24} color="#ffffff" />
+          <Pressable style={[styles.iconButton, { backgroundColor: iconBg }]}>
+            <BellIcon size={24} color={fg} />
           </Pressable>
           <Pressable
-            style={styles.iconButton}
+            style={[styles.iconButton, { backgroundColor: iconBg }]}
             onPress={() => router.push('/profile')}
             accessibilityLabel="Open profile"
             accessibilityRole="button"
           >
-            <UserIcon size={24} color="#ffffff" />
+            <UserIcon size={24} color={fg} />
           </Pressable>
         </View>
       </View>
@@ -31,9 +36,7 @@ export function Header() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: '#0a0a0a',
-  },
+  safeArea: {},
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -41,12 +44,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   logo: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#ffffff',
     letterSpacing: -0.5,
   },
   icons: {
@@ -57,7 +58,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.05)',
     justifyContent: 'center',
     alignItems: 'center',
   },
