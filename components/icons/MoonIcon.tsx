@@ -53,7 +53,7 @@ const MoonIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         strokeLinecap="round"
         strokeLinejoin="round"
         className={`cursor-pointer ${className}`}
-        style={{ overflow: "visible" }}
+        style={{ overflow: "visible", pointerEvents: "none" }}
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <motion.path

@@ -36,6 +36,7 @@ const DialpadIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         viewBox="0 0 24 24"
         fill={color}
         className={`cursor-pointer ${className}`}
+        style={{ pointerEvents: "none" }}
         onHoverStart={start}
         onHoverEnd={stop}
       >

@@ -48,6 +48,7 @@ const BrightnessDownIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         onHoverStart={handleHoverStart}
         onHoverEnd={handleHoverEnd}
         className={`inline-flex cursor-pointer items-center justify-center ${className}`}
+        style={{ pointerEvents: "none" }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

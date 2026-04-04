@@ -59,6 +59,7 @@ const ChartBarIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         strokeLinecap="round"
         strokeLinejoin="round"
         className={`cursor-pointer ${className}`}
+        style={{ pointerEvents: "none" }}
         onHoverStart={start}
         onHoverEnd={stop}
       >

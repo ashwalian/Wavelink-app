@@ -16,7 +16,12 @@ export function Header() {
           <Pressable style={styles.iconButton}>
             <BellIcon size={24} color="#ffffff" />
           </Pressable>
-          <Pressable style={styles.iconButton} onPress={() => router.push('/profile')}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={() => router.push('/profile')}
+            accessibilityLabel="Open profile"
+            accessibilityRole="button"
+          >
             <UserIcon size={24} color="#ffffff" />
           </Pressable>
         </View>

@@ -1,16 +1,23 @@
 import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { Platform } from 'react-native'
 import 'react-native-reanimated'
 import { AppProviders } from '@/components/app-providers'
+import { ThemedStatusBar } from '@/components/themed-status-bar'
 
 export default function RootLayout() {
   return (
     <AppProviders>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="profile" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="profile"
+          options={{
+            // Web modal stacks often swallow pointer events on the sheet; card keeps taps reliable.
+            presentation: Platform.OS === 'web' ? 'card' : 'modal',
+          }}
+        />
       </Stack>
-      <StatusBar style="light" />
+      <ThemedStatusBar />
     </AppProviders>
   )
 }

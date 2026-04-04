@@ -27,7 +27,12 @@ const ChevronRightIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
     }));
 
     return (
-      <motion.div ref={scope} onHoverStart={start} onHoverEnd={stop}>
+      <motion.div
+        ref={scope}
+        onHoverStart={start}
+        onHoverEnd={stop}
+        style={{ pointerEvents: "none" }}
+      >
         <motion.svg
           className={`arrow cursor-pointer ${className}`}
           xmlns="http://www.w3.org/2000/svg"

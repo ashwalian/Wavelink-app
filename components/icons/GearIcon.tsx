@@ -59,7 +59,7 @@ const GearIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
         strokeLinecap="square"
         strokeMiterlimit="10"
         className={`cursor-pointer ${className}`}
-        style={{ overflow: "visible" }}
+        style={{ overflow: "visible", pointerEvents: "none" }}
       >
         {/* Rotating group */}
         <motion.g

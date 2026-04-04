@@ -1,57 +1,157 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Switch,
+  Platform,
+  Alert,
+} from 'react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+import { useMobileWallet } from '@wallet-ui/react-native-kit';
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import MoonIcon from '@/components/icons/MoonIcon';
 import BrightnessDownIcon from '@/components/icons/BrightnessDownIcon';
+import WalletIcon from '@/components/icons/WalletIcon';
+import { useThemePreference } from '@/features/theme/theme-preference-provider';
+import { useWebSolanaWallet } from '@/features/wallet/use-web-solana-wallet';
+
+const appVersion =
+  Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? '5.37.0';
+
+function shortAddress(addr: string) {
+  if (addr.length <= 12) return addr;
+  return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { isDarkMode, setDarkMode, toggleDarkMode } = useThemePreference();
+  const { account, connect, disconnect } = useMobileWallet();
+  const webWallet = useWebSolanaWallet();
+  const [walletBusy, setWalletBusy] = useState(false);
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const isWeb = Platform.OS === 'web';
+  const walletConnected = isWeb ? !!webWallet.publicKey : !!account;
+  const walletSubtitle = (() => {
+    if (isWeb) {
+      if (webWallet.publicKey) return `Connected · ${shortAddress(webWallet.publicKey)}`;
+      return 'Not connected ';
+    }
+    if (account) return `${account.label ?? 'Connected'} · ${shortAddress(String(account.address))}`;
+    return 'Not connected';
+  })();
 
-  // Dynamic styles based on theme
-  const themeContainer = [styles.container, !isDarkMode && styles.lightContainer];
-  const themeText = [styles.itemText, !isDarkMode && styles.lightText];
-  const themeTitle = [styles.title, !isDarkMode && styles.lightText];
-  const themeCard = [styles.card, !isDarkMode && styles.lightCard];
+  const onWalletConnect = async () => {
+    setWalletBusy(true);
+    try {
+      if (isWeb) await webWallet.connect();
+      else await connect();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not connect';
+      Alert.alert('Solana wallet', message);
+    } finally {
+      setWalletBusy(false);
+    }
+  };
+
+  const onWalletDisconnect = async () => {
+    setWalletBusy(true);
+    try {
+      if (isWeb) await webWallet.disconnect();
+      else await disconnect();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not disconnect';
+      Alert.alert('Solana wallet', message);
+    } finally {
+      setWalletBusy(false);
+    }
+  };
 
   return (
-    <View style={themeContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <View
+      style={[styles.container, { backgroundColor: isDarkMode ? '#0a0a0a' : '#ffffff' }]}
+      collapsable={false}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Header with Back button */}
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()}>
-            <Text style={[styles.backButton, !isDarkMode && styles.lightBackButton]}>← Back</Text>
+          <Pressable
+            hitSlop={20}
+            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Text style={[styles.backButton, { color: isDarkMode ? '#4f46e5' : '#37306d' }]}>← Back</Text>
           </Pressable>
-          <Text style={themeTitle}>Profile</Text>
+          <Text style={[styles.title, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Profile</Text>
           <View style={{ width: 40 }} />
         </View>
 
         {/* Section 1: Account */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <View style={themeCard}>
+          <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
-              <Text style={themeText}>Account Settings</Text>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Account Settings</Text>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
             <View style={styles.item}>
               <View>
-                <Text style={themeText}>Gmail</Text>
-                <Text style={styles.itemSubText}>user@gmail.com</Text>
+                <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Gmail</Text>
+                <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>user@gmail.com</Text>
               </View>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
             <View style={styles.item}>
-              <Text style={themeText}>Purchase History</Text>
+              <View style={styles.walletRowMain}>
+                <WalletIcon
+                  size={24}
+                  color={isDarkMode ? '#a5b4fc' : '#4f46e5'}
+                  strokeWidth={2}
+                />
+                <View style={styles.itemBody}>
+                  <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>
+                    Solana wallet
+                  </Text>
+                  <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>
+                    {walletSubtitle}
+                  </Text>
+                </View>
+              </View>
+              {walletConnected ? (
+                <Pressable hitSlop={12} disabled={walletBusy} onPress={onWalletDisconnect}>
+                  <Text style={styles.disconnectLabel}>Disconnect</Text>
+                </Pressable>
+              ) : (
+                <Pressable hitSlop={12} disabled={walletBusy} onPress={onWalletConnect}>
+                  <Text
+                    style={[
+                      styles.connectLabel,
+                      { color: isDarkMode ? '#a5b4fc' : '#4f46e5' },
+                    ]}
+                  >
+                    Connect
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+            <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
+            <View style={styles.item}>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Purchase History</Text>
               <ChevronRightIcon size={18} color="#9ca3af" />
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
             <View style={styles.item}>
-              <Text style={themeText}>Currency</Text>
-              <Text style={styles.itemSubText}>USD ($)</Text>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Currency</Text>
+              <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>USD ($)</Text>
             </View>
           </View>
         </View>
@@ -59,14 +159,14 @@ export default function ProfileScreen() {
         {/* Section 2: Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Info</Text>
-          <View style={themeCard}>
+          <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
-              <Text style={themeText}>Info about Airalo</Text>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Info about Airalo</Text>
               <ChevronRightIcon size={18} color="#9ca3af" />
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
             <View style={styles.item}>
-              <Text style={themeText}>Rate this app</Text>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Rate this app</Text>
               <ChevronRightIcon size={18} color="#9ca3af" />
             </View>
           </View>
@@ -74,20 +174,71 @@ export default function ProfileScreen() {
 
         {/* Section 3: Application */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Application</Text>
-          <View style={themeCard}>
-            <Pressable style={styles.item} onPress={toggleTheme}>
-              <View>
-                <Text style={themeText}>Appearance</Text>
-                <Text style={styles.itemSubText}>{isDarkMode ? 'Dark Mode' : 'Light Mode'}</Text>
+          <Text style={[styles.sectionTitle, !isDarkMode && styles.sectionTitleLight]}>Application</Text>
+          <View style={[styles.card, !isDarkMode && styles.lightCard]}>
+            <View style={styles.item}>
+              <Pressable
+                style={styles.appearanceLeft}
+                onPress={toggleDarkMode}
+                accessibilityRole="button"
+                accessibilityLabel="Toggle appearance"
+              >
+                {isDarkMode ? (
+                  <MoonIcon size={24} color="#4f46e5" />
+                ) : (
+                  <BrightnessDownIcon size={24} color="#f59e0b" />
+                )}
+                <View style={{ marginLeft: 12 }}>
+                  <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Appearance</Text>
+                  <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>
+                    {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                  </Text>
+                </View>
+              </Pressable>
+              <Switch
+                value={isDarkMode}
+                onValueChange={setDarkMode}
+                trackColor={{ false: '#d1d5db', true: '#4f46e5' }}
+                thumbColor="#ffffff"
+                ios_backgroundColor="#d1d5db"
+                style={Platform.OS === 'web' ? styles.switchWeb : undefined}
+              />
+            </View>
+            {Platform.OS === 'web' && (
+              <View
+                style={[
+                  styles.themeWebRow,
+                  {
+                    borderTopColor: isDarkMode ? 'rgba(255,255,255,0.08)' : '#e2e8f0',
+                  },
+                ]}
+              >
+                <Pressable
+                  onPress={() => setDarkMode(true)}
+                  style={[
+                    styles.themeWebChip,
+                    isDarkMode ? styles.themeWebChipActiveDark : styles.themeWebChipIdleDark,
+                  ]}
+                >
+                  <Text style={[styles.themeWebChipText, isDarkMode && styles.themeWebChipTextOnDark]}>
+                    Dark
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setDarkMode(false)}
+                  style={[
+                    styles.themeWebChip,
+                    !isDarkMode ? styles.themeWebChipActiveLight : styles.themeWebChipIdleLight,
+                  ]}
+                >
+                  <Text style={[styles.themeWebChipText, !isDarkMode && styles.themeWebChipTextOnLight]}>
+                    Light
+                  </Text>
+                </Pressable>
               </View>
-              {isDarkMode ? (
-                <MoonIcon size={24} color="#4f46e5" />
-              ) : (
-                <BrightnessDownIcon size={24} color="#f59e0b" />
-              )}
-            </Pressable>
+            )}
           </View>
+          <Text style={[styles.versionText, { color: isDarkMode ? '#6b7280' : '#94a3b8' }]}>Version {appVersion}</Text>
         </View>
       </ScrollView>
     </View>
@@ -100,7 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0a0a0a',
   },
   lightContainer: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#ffffff',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -118,7 +269,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   lightBackButton: {
-    color: '#3730a3',
+    color: '#4f46e5',
   },
   title: {
     fontSize: 18,
@@ -137,6 +288,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+  sectionTitleLight: {
+    color: '#64748b',
+  },
   card: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 16,
@@ -145,8 +299,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   lightCard: {
-    backgroundColor: '#ffffff',
-    borderColor: '#e5e7eb',
+    backgroundColor: '#f8fafc',
+    borderColor: '#e2e8f0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -160,22 +314,104 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  itemBody: {
+    flex: 1,
+    marginRight: 12,
+  },
+  walletRowMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+    gap: 12,
+  },
+  themeWebRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  themeWebChip: {
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  themeWebChipActiveDark: {
+    backgroundColor: '#4f46e5',
+    borderColor: '#4f46e5',
+  },
+  themeWebChipIdleDark: {
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  themeWebChipActiveLight: {
+    backgroundColor: '#4f46e5',
+    borderColor: '#4f46e5',
+  },
+  themeWebChipIdleLight: {
+    backgroundColor: 'transparent',
+    borderColor: '#cbd5e1',
+  },
+  themeWebChipText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#94a3b8',
+  },
+  themeWebChipTextOnDark: {
+    color: '#ffffff',
+  },
+  themeWebChipTextOnLight: {
+    color: '#ffffff',
+  },
+  appearanceLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
+  switchWeb: {
+    transform: [{ scaleX: 1.05 }, { scaleY: 1.05 }],
+  },
+  versionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 14,
+  },
   itemText: {
     fontSize: 16,
     color: '#ffffff',
     fontWeight: '600',
   },
   lightText: {
-    color: '#111827',
+    color: '#1e293b',
   },
   itemSubText: {
     fontSize: 14,
     color: '#9ca3af',
     marginTop: 2,
   },
+  itemSubTextLight: {
+    color: '#64748b',
+  },
+  connectLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  disconnectLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#f87171',
+  },
   divider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.05)',
     marginHorizontal: 20,
+  },
+  dividerLight: {
+    backgroundColor: '#e2e8f0',
   },
 });
