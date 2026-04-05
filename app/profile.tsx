@@ -11,11 +11,14 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
+import { Image } from 'expo-image';
 import { useMobileWallet } from '@wallet-ui/react-native-kit';
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import MoonIcon from '@/components/icons/MoonIcon';
 import BrightnessDownIcon from '@/components/icons/BrightnessDownIcon';
 import WalletIcon from '@/components/icons/WalletIcon';
+import { USDC_LOGO_URI_DARK, USDC_LOGO_URI_LIGHT } from '@/constants/usdc-assets';
+import { useCurrencyPreference } from '@/features/currency/currency-preference-provider';
 import { useThemePreference } from '@/features/theme/theme-preference-provider';
 import { useWebSolanaWallet } from '@/features/wallet/use-web-solana-wallet';
 
@@ -30,6 +33,7 @@ function shortAddress(addr: string) {
 export default function ProfileScreen() {
   const router = useRouter();
   const { isDarkMode, setDarkMode } = useThemePreference();
+  const { currency, setCurrency } = useCurrencyPreference();
   const { account, connect, disconnect } = useMobileWallet();
   const webWallet = useWebSolanaWallet();
   const [walletBusy, setWalletBusy] = useState(false);
@@ -56,6 +60,22 @@ export default function ProfileScreen() {
     } finally {
       setWalletBusy(false);
     }
+  };
+
+  const usdcLogoUri = isDarkMode ? USDC_LOGO_URI_DARK : USDC_LOGO_URI_LIGHT;
+
+  const onPickCurrency = () => {
+    Alert.alert('Display currency', 'Prices in the catalogue use this unit. USDC follows USD 1:1 for display.', [
+      {
+        text: 'USD ($)',
+        onPress: () => setCurrency('usd'),
+      },
+      {
+        text: 'USDC',
+        onPress: () => setCurrency('usdc'),
+      },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const onWalletDisconnect = async () => {
@@ -149,10 +169,25 @@ export default function ProfileScreen() {
               <ChevronRightIcon size={18} color="#9ca3af" />
             </View>
             <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
-            <View style={styles.item}>
+            <Pressable style={styles.item} onPress={onPickCurrency} accessibilityRole="button">
               <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Currency</Text>
-              <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>USD ($)</Text>
-            </View>
+              <View style={styles.currencyRight}>
+                {currency === 'usdc' ? (
+                  <>
+                    <Image
+                      source={{ uri: usdcLogoUri }}
+                      style={styles.currencyIcon}
+                      contentFit="contain"
+                      accessibilityLabel="USDC"
+                    />
+                    <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>USDC</Text>
+                  </>
+                ) : (
+                  <Text style={[styles.itemSubText, !isDarkMode && styles.itemSubTextLight]}>USD ($)</Text>
+                )}
+                <ChevronRightIcon size={18} color="#9ca3af" />
+              </View>
+            </Pressable>
           </View>
         </View>
 
@@ -334,5 +369,14 @@ const styles = StyleSheet.create({
   },
   dividerLight: {
     backgroundColor: '#e2e8f0',
+  },
+  currencyRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  currencyIcon: {
+    width: 24,
+    height: 24,
   },
 });

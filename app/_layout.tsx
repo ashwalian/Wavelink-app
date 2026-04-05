@@ -16,6 +16,12 @@ export default function RootLayout() {
             presentation: Platform.OS === 'web' ? 'card' : 'modal',
           }}
         />
+        <Stack.Screen
+          name="checkout"
+          options={{
+            presentation: Platform.OS === 'web' ? 'card' : 'modal',
+          }}
+        />
       </Stack>
       <ThemedStatusBar />
     </AppProviders>

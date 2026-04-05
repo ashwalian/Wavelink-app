@@ -1,0 +1,1208 @@
+Monitor usage
+eSIM voucher
+POST
+/v2/voucher/esim
+This endpoint allows you to create an esim voucher to the Airalo Partners API. Provide the required information, such as quantity and package id
+The access token, obtained from the "Request Access Token" endpoint, should be included in the request.
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Body Structure:
+{
+    "vouchers": [
+        {
+            "package_id": "replace with actual package slug",
+            "quantity": 3,
+            "booking_reference": "123"
+        }
+    ]
+}
+Request parameters:
+vouchers (array, required):
+An array of voucher objects to be created for eSIMs. Each voucher object contains the following fields:
+package_id (string, required):
+The unique identifier (slug) of the eSIM package for which the voucher is being issued.
+Example: "package_id": "eu-europe-5gb-30days"
+quantity (integer, required):
+The number of vouchers you wish to purchase for the specified package.
+Example: "quantity": 3
+booking_reference (string, optional):
+An optional field used to store the booking reference for this voucher, which can be used for tracking purposes in your own system.
+Example: "booking_reference": "123"
+If not provided, this field will be ignored.
+Request
+Header Params
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+Content-Type
+string 
+required
+Example:
+application/json
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+myHeaders.append("Content-Type", "application/json");
+
+var requestOptions = {
+   method: 'POST',
+   headers: myHeaders,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/voucher/esim", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+Esim voucher
+text/plain
+Example
+{
+    "data": [
+        {
+            "package_id": "jaco-mobile-7days-1gb",
+            "codes": [
+                "BIXLAAAA",
+                "BSXLAAAA"
+            ],
+            "booking_reference": "123"
+        },
+        {
+            "package_id": "liberation-mobile-30days-3gb",
+            "codes": [
+                "1HKGDUMP"
+            ],
+            "booking_reference": "123"
+        }
+    ],
+    "meta": {
+        "message": "success"
+    }
+}
+🟢200
+Esim voucher error
+
+
+
+Get top-up package list
+GET
+/v2/sims/{iccid}/topups
+Endpoint do support new type of packages - "Voice and Text"
+To get the list of available packages for an eSIM:
+Make a GET request to the endpoint URL https://partners-api.airalo.com/v1/sims/:iccid/topups, replace :iccid with the ICCID of the eSIM for which you want to purchase a top-up.
+The API will respond with a JSON object containing an array of available top-up packages, each of which includes an ID, price, data amount, duration, and other information.
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Request
+Path Params
+iccid
+string 
+required
+eSIM ICCID, used to query a list of available top-up packages.
+Required. Can be obtained by execuring GET to the "eSIMs List" endpoint
+Example:
+8910300000005271146
+Header Params
+Accept
+string 
+required
+Example:
+application/json
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+
+var requestOptions = {
+   method: 'GET',
+   headers: myHeaders,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/sims/8910300000005271146/topups", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+eSIM: List available top-up packages: 200 OK
+application/json
+pricing
+object 
+required
+model
+string 
+required
+discount_percentage
+integer 
+required
+data
+array [object] 
+required
+id
+string 
+required
+type
+string 
+required
+price
+integer 
+required
+amount
+integer 
+required
+day
+integer 
+required
+is_unlimited
+boolean 
+required
+title
+string 
+required
+data
+string 
+required
+short_info
+string 
+required
+voice
+integer 
+required
+text
+integer 
+required
+net_price
+integer  | 
+number 
+required
+Example
+{
+    "pricing": {
+        "model": "net_pricing",
+        "discount_percentage": 0
+    },
+    "data": [
+        {
+            "id": "bonbon-mobile-30days-3gb-topup",
+            "type": "topup",
+            "price": 10,
+            "amount": 3072,
+            "day": 30,
+            "is_unlimited": false,
+            "title": "3 GB - 100 SMS - 100 Mins - 30 Days",
+            "data": "3 GB",
+            "short_info": "This eSIM doesn't come with a phone number.",
+            "voice": 100,
+            "text": 100,
+            "net_price": 8
+        },
+        {
+            "id": "bonbon-mobile-30days-5gb-topup",
+            "type": "topup",
+            "price": 14,
+            "amount": 5120,
+            "day": 30,
+            "is_unlimited": false,
+            "title": "5 GB - 30 Days",
+            "data": "5 GB",
+            "short_info": "This eSIM doesn't come with a phone number.",
+            "voice": 100,
+            "text": 100,
+            "net_price": 11.2
+        },
+        {
+            "id": "bonbon-mobile-30days-10gb-topup",
+            "type": "topup",
+            "price": 23,
+            "amount": 10240,
+            "day": 30,
+            "is_unlimited": false,
+            "title": "10 GB - 30 Days",
+            "data": "10 GB",
+            "short_info": "This eSIM doesn't come with a phone number.",
+            "voice": 100,
+            "text": 100,
+            "net_price": 18.4
+        }
+    ]
+}
+🟢200
+eSIM: List available top-up packages: 200 (No top-up packages available)
+🟢200
+eSIM: List available top-up packages: 404 (Invalid ICCID)
+🟠422
+eSIM: List available top-up packages: (Recycled Sim Response 422)
+🟢200
+(Discount pricing) eSIM: List available top-up packages
+Modified at 4 months ago
+Previous
+eSIM voucher
+
+
+
+Place top up order
+Submit top-up order
+POST
+/v2/orders/topups
+To submit a top-up order:
+Make a POST request to the endpoint URL {{url}}/{{version}}/orders/topups
+Include a request body in the form of a FormData object, which contains the following required fields:
+1.
+package_id: The ID of the top-up package you want to purchase
+2.
+iccid: The ICCID of the eSIM for which you want to purchase the top-up package.
+You can also include an optional description field to provide additional information about the order.
+The API will respond with a JSON object containing the details of the order, including the package ID, quantity, price, and other information.
+The complete workflow for buying a top-up package:
+1.
+GET {{url}}/{{version}}/sims to see the list of purchased eSIMs
+2.
+GET {{url}}/{{version}}/sims/:iccid/topups to see the list of available top-ups for the eSIMs
+3.
+POST {{url}}/{{version}}/orders/topups with the proper "iccid" and "package_id" values to purchase a top-up
+4.
+GET {{url}}/{{version}}/sims/:iccid/packages to see the list of all packages for the eSIM, including the original package and top-ups
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Request
+Header Params
+Accept
+string 
+required
+Example:
+application/json
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params multipart/form-data
+package_id
+string 
+required
+Required. A Topup Package ID, can be obtainer by executing a GET request to the "eSIM: List available top-up packages" endpoint
+Example:
+change-7days-1gb-topup
+iccid
+string 
+required
+Required. eSIM ICCID, that identifies the eSIM for the top-up package.
+Can be obtained by execuring GET to the "eSIMs List" endpoint
+Example:
+873000000000042542
+description
+string 
+required
+Optional. Order description to identify the order.
+Example:
+Example description to identify the order
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+
+var formdata = new FormData();
+formdata.append("package_id", "change-7days-1gb-topup");
+formdata.append("iccid", "873000000000042542");
+formdata.append("description", "Example description to identify the order");
+
+var requestOptions = {
+   method: 'POST',
+   headers: myHeaders,
+   body: formdata,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/orders/topups", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+Submit Top-up Order: 200 OK
+application/json
+data
+object 
+required
+id
+integer 
+required
+code
+string 
+required
+package_id
+string 
+required
+currency
+string 
+required
+quantity
+integer 
+required
+type
+string 
+required
+description
+string 
+required
+esim_type
+string 
+required
+validity
+integer 
+required
+package
+string 
+required
+data
+string 
+required
+price
+number 
+required
+pricing_model
+string 
+required
+text
+null 
+required
+voice
+null 
+required
+net_price
+number 
+required
+created_at
+string 
+required
+manual_installation
+string 
+required
+qrcode_installation
+string 
+required
+installation_guides
+object 
+required
+meta
+object 
+required
+message
+string 
+required
+Example
+{
+    "data": {
+        "id": 111,
+        "code": "20251118-000111",
+        "package_id": "change-7days-1gb-topup",
+        "currency": "USD",
+        "quantity": 1,
+        "type": "topup",
+        "description": "Topup (873000000000042542)",
+        "esim_type": "local",
+        "validity": 7,
+        "package": "Change-1 GB - 7 Days",
+        "data": "1 GB",
+        "price": 4.5,
+        "pricing_model": "net_pricing",
+        "text": null,
+        "voice": null,
+        "net_price": 3.6,
+        "created_at": "2025-11-18 13:37:07",
+        "manual_installation": "<p><b>eSIM name:</b> Change</p><p><b>Coverage: </b>United States</p><p><b>To manually activate the eSIM on your eSIM capable device:</b></p><ol><li>Settings > Cellular/Mobile > Add Cellular/Mobile Plan.</li><li>Manually enter the SM-DP+ Address and activation code.</li><li>Confirm eSIM plan details.</li><li>Label the eSIM.</li></ol><p><b>To access Data:</b></p><ol><li>Enable data roaming.</li></ol>",
+        "qrcode_installation": "<p><b>eSIM name:</b> Change</p><p><b>Coverage: </b>United States</p><p><b>To activate the eSIM by scanning the QR code on your eSIM capable device you need to print or display this QR code on other device:</b></p><ol><li>Settings > Cellular/Mobile > Add Cellular/Mobile Plan.</li><li>Scan QR code.</li><li>Confirm eSIM plan details.</li><li>Label the eSIM.</li></ol><p><b>To access Data:</b></p><ol><li>Enable data roaming.</li></ol>",
+        "installation_guides": {
+            "en": "https://www.airalo.com/help/getting-started-with-airalo"
+        }
+    },
+    "meta": {
+        "message": "success"
+    }
+}
+🟠422
+Submit Top-up Order: 422 (Purchase limit exceeded)
+🟠422
+Submit Top-up Order: 422 (Required fields are missing)
+🟠422
+Submit Top-up Order: 422 (Invalid package id)
+🟠422
+Submit Top-up Order: 422 (Recycled sim)
+🟢200
+(Discount pricing) Submit Top-up Order
+Modified at 4 months ago
+
+Manage orders
+Get order list
+GET
+/v2/orders
+This endpoint allows you to retrieve a list of your orders from the Airalo Partners API. By using various filters, you can customize the results to match specific criteria. The access token, obtained from the "Request Access Token" endpoint, should be included in the request.
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Request
+Query Params
+include
+string 
+optional
+Optional. A comma-separated string to include related data in the response. Possible values are "sims", "user", and "status".
+Example:
+sims,user,status
+filter[created_at]
+string 
+optional
+Optional. A string to filter orders by their creation date. Specify the date range using a dash (-) as a delimiter for correct parsing.
+Example:
+Y-m-d - Y-m-d
+filter[code]
+string 
+optional
+Optional. Filter orders by their order code. This performs a like search using the format '%ORDER_CODE%'.
+Example:
+20221021-003188
+filter[order_status]
+string 
+optional
+Optional. A string to filter orders by their status. Possible values: "completed", "failed", "partially_refunded", and "refunded".
+Example:
+completed
+filter[iccid]
+string 
+optional
+Optional. Filter orders by the sim's ICCID. This performs a like search using the format '%SIM_ICCID%'.
+Example:
+891000000000001868
+filter[description]
+string 
+optional
+Optional. A string to filter orders by their description. This performs a like search using the format '%DESCRIPTION%'.
+Example:
+Your order description
+limit
+string 
+optional
+Optional. An integer specifying how many orders will be returned on each page.
+Example:
+50
+page
+string 
+optional
+Optional. An integer specifying the pagination's current page.
+Example:
+1
+Header Params
+Accept
+string 
+required
+Example:
+application/json
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params multipart/form-data
+object
+ 
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+
+var formdata = new FormData();
+
+var requestOptions = {
+   method: 'GET',
+   headers: myHeaders,
+   body: formdata,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/orders?include=sims,user,status&filter[created_at]=Y-m-d - Y-m-d&filter[code]=20221021-003188&filter[order_status]=completed&filter[iccid]=891000000000001868&filter[description]=Your order description&limit=50&page=1", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟠422
+Order List (422)
+application/json
+data
+object 
+required
+limit
+string 
+required
+page
+string 
+required
+meta
+object 
+required
+message
+string 
+required
+Example
+{
+    "data": {
+        "limit": "The limit must be an integer.",
+        "page": "The page must be an integer."
+    },
+    "meta": {
+        "message": "the parameter is invalid"
+    }
+}
+🟢200
+Order List (200)
+Modified at 8 months ago
+
+
+Manage orders
+Get order
+GET
+/v2/orders/{order_id}
+This endpoint allows you to retrieve the details of a specific order from the Airalo Partners API using the order ID. You can also include related data in the response by specifying optional parameters. The access token, obtained from the "Request Access Token" endpoint, should be included in the request.
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Request
+Path Params
+order_id
+string 
+required
+The order ID for which you want to retrieve the details.
+Query Params
+include
+string 
+optional
+Optional. A comma-separated string to include related data in the response. Possible values are "sims", "user", and "status".
+Example:
+sims,user,status
+Header Params
+Accept
+string 
+required
+Example:
+application/json
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+
+var requestOptions = {
+   method: 'GET',
+   headers: myHeaders,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/orders/", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟠401
+Get Order (401)
+application/json
+data
+array
+required
+meta
+object 
+required
+message
+string 
+required
+Example
+{
+    "data": [],
+    "meta": {
+        "message": "This action is unauthorized."
+    }
+}
+🟢200
+Get Order (200)
+Modified at 9 months ago
+
+
+Manage orders
+Cancel future orders
+POST
+/v2/cancel-future-orders
+This endpoint allows you to submit future order cancellation requests via the Airalo Partner API.
+To proceed, provide an array of request_id strings from the "Create Future Order" endpoint response.
+Please note:
+Future orders can be canceled up to 24 hours before the due date.
+You can include up to 10 future orders in a single request.
+An access token from the "Request Access Token" endpoint is required.
+For more details and best practices, visit our FAQ page.
+Request
+Header Params
+Accept
+string 
+required
+Example:
+application/json
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params
+application/json
+request_ids
+array[string]
+required
+Example
+{
+    "request_ids": [
+        "wPnaOiEcdyP11pEPeJ-jLhT_I",
+        "Q2FMVdpbIAFh0RVvtjKkya8a1",
+        "OKjfHGS5qzRWzt74iKfm9YeVe"
+    ]
+}
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+   "request_ids": [
+      "wPnaOiEcdyP11pEPeJ-jLhT_I",
+      "Q2FMVdpbIAFh0RVvtjKkya8a1",
+      "OKjfHGS5qzRWzt74iKfm9YeVe"
+   ]
+});
+
+var requestOptions = {
+   method: 'POST',
+   headers: myHeaders,
+   body: raw,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/cancel-future-orders", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+Success
+application/json
+data
+array[string]
+required
+meta
+object 
+required
+message
+string 
+required
+Example
+{
+    "data": [],
+    "meta": {
+        "message": "Future orders cancelled successfully"
+    }
+}
+🟠422
+Not valid request ID
+🟠422
+Already processed request ID
+🟠422
+Request Id does not exist
+Modified at 4 days ago
+
+Manage orders
+Future Orders
+GET
+/v2/future-orders
+This endpoint allows you to get all your submitted future orders that are in pending, failed or retry status
+The following filter parameters are available:
+status (optional) - Defaults to pending. Other possible statuses are: failed and retry
+limit (optional) - Defaults to 25. Limit the returned results
+from_due_date - Datetime field in the format: Y-m-d H:i. Filters data starting from this date forward. Example: 2025-02-27 10:00
+to_due_date - Datetime field in the format: Y-m-d H:i. Filters data starting from this date backward. Example: 2025-02-27 10:00
+NOTE: that processed orders will not be displayed here.
+Request
+Query Params
+status
+string 
+optional
+Defaults to pending. Other possible status options: failed, retry
+limit
+string 
+optional
+Limit the returned results
+from_due_date
+string 
+optional
+Date in format: 2025-02-27 10:00
+to_due_date
+string 
+optional
+Date in format: 2025-02-27 10:00
+Header Params
+Authorization
+string 
+optional
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params multipart/form-data
+object
+ 
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+
+var formdata = new FormData();
+
+var requestOptions = {
+   method: 'GET',
+   headers: myHeaders,
+   body: formdata,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/future-orders?status&limit&from_due_date&to_due_date", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+Success
+application/json
+data
+array [object] 
+required
+request_id
+string 
+required
+quantity
+integer 
+required
+description
+string 
+required
+status
+string 
+required
+package_id
+string 
+required
+due_date
+string 
+required
+latest_cancellation_date
+string 
+required
+links
+object 
+required
+first
+string 
+required
+last
+string 
+required
+prev
+null 
+required
+next
+string 
+required
+meta
+object 
+required
+message
+string 
+required
+current_page
+integer 
+required
+from
+integer 
+required
+last_page
+integer 
+required
+path
+string 
+required
+per_page
+string 
+required
+to
+integer 
+required
+total
+integer 
+required
+Examples
+Success
+Success
+{
+    "data": [
+        {
+            "request_id": "ehFeHAa_R1GyIgHxNrP6Iz0Hy",
+            "quantity": 1,
+            "description": "",
+            "status": "pending",
+            "package_id": "change-7days-1gb",
+            "due_date": "2025-03-24 10:00",
+            "latest_cancellation_date": "2025-03-23 10:00"
+        },
+        {
+            "request_id": "UPMpgaC9rWr799augw9KbI_ia",
+            "quantity": 1,
+            "description": "",
+            "status": "pending",
+            "package_id": "change-7days-1gb",
+            "due_date": "2025-02-27 10:00",
+            "latest_cancellation_date": "2025-02-26 10:00"
+        },
+        {
+            "request_id": "-s5Cx8jTjvx2UH_euzhaHbwiu",
+            "quantity": 1,
+            "description": "",
+            "status": "pending",
+            "package_id": "change-7days-1gb",
+            "due_date": "2025-02-27 10:00",
+            "latest_cancellation_date": "2025-02-26 10:00"
+        }
+    ],
+    "links": {
+        "first": "https://partners-api.airalo.com/v2/future-orders?filter%5B%27status%27%5D=%27failed%27&status=pending&page=1",
+        "last": "https://partners-api.airalo.com/v2/future-orders?filter%5B%27status%27%5D=%27failed%27&status=pending&page=3",
+        "prev": null,
+        "next": "https://partners-api.airalo.com/v2/future-orders?filter%5B%27status%27%5D=%27failed%27&status=pending&page=2"
+    },
+    "meta": {
+        "message": "success",
+        "current_page": 1,
+        "from": 1,
+        "last_page": 1,
+        "path": "https://partners-api.airalo.com/v2/future-orders",
+        "per_page": "25",
+        "to": 3,
+        "total": 3
+    }
+}
+🟠422
+Invalid from due date
+Modified at 4 days ago
+Previous
+
+Notifications
+Webhook simulator
+POST
+/v2/simulator/webhook
+With this endpoint, you can trigger a Low data notification webhook event with mock data to your opted-in webhook URL. This is useful during the testing/integration phase where you can test your server when receiving such events.
+Parameters
+"event" - string required
+"type" - string required
+"iccid" - string optional
+For more informations, best practices visit our FAQ page: https://airalopartners.zendesk.com/hc/en-us/sections/13207524820893-FAQ
+Request
+Header Params
+Authorization
+string 
+required
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params
+application/json
+event
+string 
+required
+type
+string 
+required
+iccid
+string 
+required
+Example
+{
+    "event": "low_data_notification",
+    "type": "expire_1",
+    "iccid": "8997212330099025334"
+}
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+   "event": "low_data_notification",
+   "type": "expire_1",
+   "iccid": "8997212330099025334"
+});
+
+var requestOptions = {
+   method: 'POST',
+   headers: myHeaders,
+   body: raw,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/simulator/webhook", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢200
+Webhook Simulator
+text/plain
+Example
+{
+    "success": "Notification sent"
+}
+Modified at 8 months ago
+Previous
+Opt out
+
+
+Request refund
+Request refund
+POST
+/v2/refund
+Overview
+The Airalo Refund API makes it simple to request refunds for eSIMs. This guide walks you through everything you need to know, including the API endpoint, request and response formats, error handling, and sample requests.
+⚠️ Important Disclaimer
+The Refund API helps streamline the refund request process by reducing manual effort. However, submitting a request through this API does not guarantee approval.
+Each refund request is individually reviewed based on Airalo's Refund Policy to ensure it meets all terms and conditions. Refund approvals remain subject to Airalo’s internal policies and decisions.
+If your request meets the contract terms, the refund will be credited to your account as Airalo credits, ready to use for future transactions.
+Request
+Header Params
+Accept
+string 
+optional
+Indicates the expected response format.
+Example:
+application/json
+Authorization
+string 
+optional
+Bearer token for authenticating the request
+Example:
+Bearer {{token}}
+url
+string 
+optional
+Default:
+https://partners-api.airalo.com
+Body Params
+text/plain
+Example
+Required Fields
+iccids
+Type: array
+Description: An array of ICCIDs (max 5). Each ICCID must be a string of digits.
+reason
+Type: string
+Description: The reason for the refund. Accepted values listed below.
+Accepted Reason Values:
+INSTALLATION_FAILURE
+NO_COVERAGE
+APN_FAILURE
+TRIP_CANCELLATION
+INTERMITTENT_CONNECTION
+BLOCKED_NETWORK
+CHANGE_OF_PLAN
+DELETED_ESIM
+EARLY_EXPIRY
+HOTSPOT_NOT_WORKING
+IMSI_CHANGE
+INCOMPATIBLE_DEVICE
+LOCKED_DEVICE
+NO_VOICE_TEXT_SERVICES
+OVERCHARGED
+SLOW_SPEED
+TOP_UP_PACKAGE_FAILURE
+UNKNOWN_CHARGES
+WRONG_PURCHASE
+UNABLE_TO_ACCESS_APPS
+SERVICE_DEGRADATION
+QR_ISSUE_PARTNERS
+OTHERS
+Optional Fields
+notes
+Type: string
+Description: Additional notes (max 255 characters). Required if reason is "OTHERS".
+email
+Type: string
+Description: Optional email address for follow-up (must be a valid email).
+Example:{ "iccids": [ "894000000000001", "894000000000002" ], "reason": "SERVICE_ISSUES", "notes": "Connection issues in the region." }
+Request Code Samples
+Fetch
+Axios
+jQuery
+XHR
+Native
+Request
+Unirest
+var myHeaders = new Headers();
+myHeaders.append("Accept", "application/json");
+myHeaders.append("Authorization", "Bearer {{token}}");
+myHeaders.append("url", "https://partners-api.airalo.com");
+myHeaders.append("Content-Type", "text/plain");
+
+var raw = "\n{\n  \"iccids\": [\n    \"894000000000001\",\n    \"894000000000002\"\n  ],\n  \"reason\": \"SERVICE_ISSUES\",\n  \"notes\": \"Connection issues in the region.\"\n}";
+
+var requestOptions = {
+   method: 'POST',
+   headers: myHeaders,
+   body: raw,
+   redirect: 'follow'
+};
+
+fetch("https://partners-api.airalo.com/v2/refund", requestOptions)
+   .then(response => response.text())
+   .then(result => console.log(result))
+   .catch(error => console.log('error', error));
+Responses
+🟢202
+Accepted
+application/json
+data
+object 
+required
+refund_id
+string 
+required
+created_at
+string 
+required
+meta
+object 
+required
+message
+string 
+required
+Example
+{
+    "data": {
+        "refund_id": "12345",
+        "created_at": "2024-10-12 09:30"
+    },
+    "meta": {
+        "message": "success"
+    }
+}
+🟠422
+Parameter Error
+🟠422
+Parameter Error
+🟠422
+Parameter Error

@@ -18,6 +18,8 @@ import {
   type AiraloCatalogCountry,
   type AiraloCatalogSimPackage,
 } from '@/lib/airalo'
+import { formatPlanDisplayPrice } from '@/lib/format-plan-price'
+import { useCurrencyPreference } from '@/features/currency/currency-preference-provider'
 import { useThemePreference } from '@/features/theme/theme-preference-provider'
 
 export default function CountryPlansScreen() {
@@ -57,7 +59,9 @@ export default function CountryPlansScreen() {
           <Text style={styles.back}>← Back</Text>
         </Pressable>
         <Text style={[styles.headerTitle, { color: titleC }]} numberOfLines={1}>
-          {primary?.title ?? (countryCode || 'Plans')}
+          {primary
+            ? `${countryCodeToFlagEmoji(primary.country_code)} ${primary.country_code}`
+            : countryCode || 'Plans'}
         </Text>
         <View style={{ width: 56 }} />
       </View>
@@ -119,7 +123,7 @@ export default function CountryPlansScreen() {
               ))}
               <View style={styles.planList}>
                 {op.packages.map((pkg) => (
-                  <PlanCard key={pkg.id} pkg={pkg} />
+                  <PlanCard key={pkg.id} pkg={pkg} countryCode={primary.country_code} />
                 ))}
               </View>
             </View>
@@ -130,21 +134,45 @@ export default function CountryPlansScreen() {
   )
 }
 
-function PlanCard({ pkg }: { pkg: AiraloCatalogSimPackage }) {
+function PlanCard({ pkg, countryCode }: { pkg: AiraloCatalogSimPackage; countryCode: string }) {
+  const router = useRouter()
   const { isDarkMode } = useThemePreference()
+  const { currency } = useCurrencyPreference()
   const dataLabel = formatDataAmountMb(pkg.amount, pkg.is_unlimited)
   const cardBg = isDarkMode ? 'rgba(255,255,255,0.04)' : '#f8fafc'
   const cardBorder = isDarkMode ? 'rgba(255,255,255,0.08)' : '#e2e8f0'
   const titleC = isDarkMode ? '#fff' : '#0f172a'
   const rowC = isDarkMode ? '#9ca3af' : '#64748b'
   const hintC = isDarkMode ? '#6b7280' : '#94a3b8'
+  const priceNum = typeof pkg.price === 'number' ? pkg.price : Number(pkg.price)
+  const priceText = Number.isFinite(priceNum)
+    ? formatPlanDisplayPrice(priceNum, currency)
+    : String(pkg.price)
+
+  const goCheckout = () => {
+    router.push({
+      pathname: '/checkout',
+      params: {
+        packageId: pkg.id,
+        title: pkg.title,
+        price: String(Number.isFinite(priceNum) ? priceNum : ''),
+        countryCode: countryCode.trim(),
+      },
+    })
+  }
+
   return (
-    <View style={[styles.planCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+    <Pressable
+      onPress={goCheckout}
+      style={({ pressed }) => [
+        styles.planCard,
+        { backgroundColor: cardBg, borderColor: cardBorder },
+        pressed && { opacity: 0.92 },
+      ]}
+    >
       <View style={styles.planTop}>
         <Text style={[styles.planTitle, { color: titleC }]}>{pkg.title}</Text>
-        <Text style={styles.planPrice}>
-          ${typeof pkg.price === 'number' ? pkg.price.toFixed(2) : pkg.price}
-        </Text>
+        <Text style={styles.planPrice}>{priceText}</Text>
       </View>
       <Text style={[styles.planRow, { color: rowC }]}>
         {dataLabel} · {pkg.day} days
@@ -153,7 +181,8 @@ function PlanCard({ pkg }: { pkg: AiraloCatalogSimPackage }) {
       {pkg.is_fair_usage_policy && pkg.fair_usage_policy ? (
         <Text style={styles.fairUsage}>Fair use: {pkg.fair_usage_policy}</Text>
       ) : null}
-    </View>
+      <Text style={styles.tapHint}>Tap to checkout</Text>
+    </Pressable>
   )
 }
 
@@ -289,5 +318,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fbbf24',
     lineHeight: 16,
+  },
+  tapHint: {
+    marginTop: 12,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#818cf8',
   },
 })

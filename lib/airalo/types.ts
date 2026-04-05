@@ -110,3 +110,120 @@ export type AiraloCreditLimitWebhookPayload = {
   remaining?: number
   [key: string]: unknown
 }
+
+/** POST /v2/orders — response shape varies; narrow in UI as needed. */
+export type AiraloSubmitOrderResponse = {
+  data?: {
+    id?: number
+    package_id?: string
+    price?: number
+    currency?: string
+    sims?: unknown[]
+    direct_apple_installation_url?: string
+    qrcode_installation?: string
+    manual_installation?: string
+    [key: string]: unknown
+  }
+  meta?: { message?: string }
+}
+
+/** POST /v2/voucher/esim */
+export type AiraloEsimVoucherResponse = {
+  data?: Array<{
+    package_id?: string
+    codes?: string[]
+    booking_reference?: string
+    [key: string]: unknown
+  }>
+  meta?: { message?: string }
+}
+
+/** GET /v2/sims/{iccid}/topups */
+export type AiraloSimTopupsResponse = {
+  pricing: AiraloPricingBlock
+  data: unknown[]
+}
+
+/** POST /v2/orders/topups */
+export type AiraloTopupOrderResponse = {
+  data?: Record<string, unknown>
+  meta?: { message?: string }
+}
+
+/** GET /v2/orders */
+export type AiraloOrdersListResponse = {
+  data?: unknown
+  links?: AiraloPackagesLinks
+  meta?: AiraloPackagesMeta | { message?: string; [key: string]: unknown }
+}
+
+/** GET /v2/orders/{order_id} */
+export type AiraloOrderDetailResponse = {
+  data?: unknown
+  meta?: { message?: string }
+}
+
+/** POST /v2/cancel-future-orders */
+export type AiraloCancelFutureOrdersResponse = {
+  data?: string[]
+  meta?: { message?: string }
+}
+
+export type AiraloFutureOrderRow = {
+  request_id: string
+  quantity: number
+  description: string
+  status: string
+  package_id: string
+  due_date: string
+  latest_cancellation_date: string
+}
+
+/** GET /v2/future-orders */
+export type AiraloFutureOrdersResponse = {
+  data?: AiraloFutureOrderRow[]
+  links?: AiraloPackagesLinks
+  meta?: AiraloPackagesMeta | { message?: string; [key: string]: unknown }
+}
+
+/** POST /v2/simulator/webhook */
+export type AiraloWebhookSimulatorResponse = {
+  success?: string
+  [key: string]: unknown
+}
+
+/** POST /v2/refund (202) */
+export type AiraloRefundRequestResponse = {
+  data?: {
+    refund_id?: string
+    created_at?: string
+    [key: string]: unknown
+  }
+  meta?: { message?: string }
+}
+
+/** Documented refund reasons (POST /v2/refund). */
+export type AiraloRefundReason =
+  | 'INSTALLATION_FAILURE'
+  | 'NO_COVERAGE'
+  | 'APN_FAILURE'
+  | 'TRIP_CANCELLATION'
+  | 'INTERMITTENT_CONNECTION'
+  | 'BLOCKED_NETWORK'
+  | 'CHANGE_OF_PLAN'
+  | 'DELETED_ESIM'
+  | 'EARLY_EXPIRY'
+  | 'HOTSPOT_NOT_WORKING'
+  | 'IMSI_CHANGE'
+  | 'INCOMPATIBLE_DEVICE'
+  | 'LOCKED_DEVICE'
+  | 'NO_VOICE_TEXT_SERVICES'
+  | 'OVERCHARGED'
+  | 'SLOW_SPEED'
+  | 'TOP_UP_PACKAGE_FAILURE'
+  | 'UNKNOWN_CHARGES'
+  | 'WRONG_PURCHASE'
+  | 'UNABLE_TO_ACCESS_APPS'
+  | 'SERVICE_DEGRADATION'
+  | 'QR_ISSUE_PARTNERS'
+  | 'OTHERS'
