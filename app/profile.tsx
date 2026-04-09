@@ -196,7 +196,7 @@ export default function ProfileScreen() {
           <Text style={[styles.sectionTitle, !isDarkMode && styles.sectionTitleLight]}>Info</Text>
           <View style={[styles.card, !isDarkMode && styles.lightCard]}>
             <View style={styles.item}>
-              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Info about Airalo</Text>
+              <Text style={[styles.itemText, { color: isDarkMode ? '#ffffff' : '#1e293b' }]}>Info about Wavelink</Text>
               <ChevronRightIcon size={18} color="#9ca3af" />
             </View>
             <View style={[styles.divider, !isDarkMode && styles.dividerLight]} />
