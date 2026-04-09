@@ -227,3 +227,14 @@ export type AiraloRefundReason =
   | 'SERVICE_DEGRADATION'
   | 'QR_ISSUE_PARTNERS'
   | 'OTHERS'
+
+/** GET /v2/compatible-devices-lite */
+export type AiraloCompatibleDevicesLiteResponse = {
+  data?: Array<{
+    name?: string
+    brand?: string
+    model?: string
+    [key: string]: unknown
+  }>
+  meta?: { message?: string }
+}

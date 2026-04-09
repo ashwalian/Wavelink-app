@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  TextInput,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
@@ -19,9 +20,12 @@ import {
 } from '@/lib/airalo'
 import { useThemePreference } from '@/features/theme/theme-preference-provider'
 
+const POPULAR_COUNTRY_CODES = ['US', 'GB', 'AE', 'IN', 'TH', 'TR', 'SA', 'FR']
+
 export default function DataPlansScreen() {
   const router = useRouter()
   const { isDarkMode } = useThemePreference()
+  const [searchValue, setSearchValue] = useState('')
 
   const packagesQuery = useQuery({
     queryKey: ['airalo', 'packages', 'local', 'all'],
@@ -42,6 +46,31 @@ export default function DataPlansScreen() {
       .sort((a, b) => a.title.localeCompare(b.title))
   }, [packagesQuery.data])
 
+  const filteredCountries = useMemo(() => {
+    const term = searchValue.trim().toLowerCase()
+    if (!term) return countries
+    return countries.filter((country) => {
+      const title = country.title.toLowerCase()
+      const code = country.country_code.toLowerCase()
+      return title.includes(term) || code.includes(term)
+    })
+  }, [countries, searchValue])
+
+  const popularCountries = useMemo(() => {
+    const popularSet = new Set(POPULAR_COUNTRY_CODES)
+    const hits = filteredCountries.filter((country) => popularSet.has(country.country_code.trim()))
+    return hits.sort(
+      (a, b) =>
+        POPULAR_COUNTRY_CODES.indexOf(a.country_code.trim()) -
+        POPULAR_COUNTRY_CODES.indexOf(b.country_code.trim()),
+    )
+  }, [filteredCountries])
+
+  const allDestinations = useMemo(() => {
+    const popularSet = new Set(popularCountries.map((country) => country.country_code.trim()))
+    return filteredCountries.filter((country) => !popularSet.has(country.country_code.trim()))
+  }, [filteredCountries, popularCountries])
+
   const bg = isDarkMode ? '#0a0a0a' : '#ffffff'
   const headingC = isDarkMode ? '#ffffff' : '#0f172a'
   const subC = isDarkMode ? '#9ca3af' : '#64748b'
@@ -50,14 +79,32 @@ export default function DataPlansScreen() {
   const pressedBg = isDarkMode ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.1)'
   const pressedBorder = isDarkMode ? 'rgba(99,102,241,0.35)' : '#818cf8'
   const chevron = isDarkMode ? '#9ca3af' : '#94a3b8'
+  const inputBg = isDarkMode ? 'rgba(255,255,255,0.04)' : '#f8fafc'
+  const inputBorder = isDarkMode ? 'rgba(255,255,255,0.08)' : '#e2e8f0'
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.heading, { color: headingC }]}>Countries</Text>
-        <Text style={[styles.sub, { color: subC }]}>
-          eSIM data plans from Airalo. Tap a country to see operators and packages.
+        <Text style={[styles.heading, { color: headingC }]}>Where are you travelling next ?</Text>
+        <Text style={[styles.subheading, { color: subC }]}>
+          Wavelink helps you find travel eSIM plans in seconds.
         </Text>
+        <TextInput
+          value={searchValue}
+          onChangeText={setSearchValue}
+          placeholder="Search your destination"
+          placeholderTextColor={subC}
+          autoCapitalize="none"
+          autoCorrect={false}
+          style={[
+            styles.searchInput,
+            {
+              color: headingC,
+              backgroundColor: inputBg,
+              borderColor: inputBorder,
+            },
+          ]}
+        />
 
         {packagesQuery.isLoading && (
           <View style={styles.banner}>
@@ -68,59 +115,121 @@ export default function DataPlansScreen() {
 
         {packagesQuery.isError && (
           <View style={styles.errorBox}>
-            <Text style={styles.errorTitle}>Could not load catalogue</Text>
+            <Text style={styles.errorTitle}>Could not load destinations</Text>
             <Text style={styles.errorBody}>{(packagesQuery.error as Error).message}</Text>
             <Text style={[styles.errorHint, { color: subC }]}>
-              Set credentials in .env. On web run{' '}
-              <Text style={{ fontWeight: '800' }}>npm run airalo-proxy</Text> in a second terminal and
-              keep EXPO_PUBLIC_AIRALO_DEV_PROXY=http://localhost:8787, then restart Expo.
+              Please check your internet connection and restart the app.
             </Text>
           </View>
         )}
 
+        {popularCountries.length > 0 ? (
+          <>
+            <Text style={[styles.sectionHeading, { color: headingC }]}>Popular</Text>
+            <View style={styles.list}>
+              {popularCountries.map((country) => (
+                <CountryCard
+                  key={`${country.country_code}-${country.slug}`}
+                  country={country}
+                  headingC={headingC}
+                  subC={subC}
+                  chevron={chevron}
+                  cardBg={cardBg}
+                  cardBorder={cardBorder}
+                  pressedBg={pressedBg}
+                  pressedBorder={pressedBorder}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/country/[countryCode]',
+                      params: { countryCode: country.country_code.trim() },
+                    })
+                  }
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
+
+        <Text style={[styles.sectionHeading, { color: headingC }]}>All destinations</Text>
         <View style={styles.list}>
-          {countries.map((country) => (
-            <Pressable
+          {allDestinations.map((country) => (
+            <CountryCard
               key={`${country.country_code}-${country.slug}`}
-              style={({ pressed }) => [
-                styles.countryCard,
-                { backgroundColor: cardBg, borderColor: cardBorder },
-                pressed && {
-                  backgroundColor: pressedBg,
-                  borderColor: pressedBorder,
-                },
-              ]}
+              country={country}
+              headingC={headingC}
+              subC={subC}
+              chevron={chevron}
+              cardBg={cardBg}
+              cardBorder={cardBorder}
+              pressedBg={pressedBg}
+              pressedBorder={pressedBorder}
               onPress={() =>
                 router.push({
                   pathname: '/country/[countryCode]',
                   params: { countryCode: country.country_code.trim() },
                 })
               }
-            >
-              <View style={styles.countryLeft}>
-                {country.image?.url ? (
-                  <Image
-                    source={{ uri: country.image.url }}
-                    style={styles.thumb}
-                    contentFit="cover"
-                    accessibilityLabel={country.title}
-                  />
-                ) : (
-                  <Text style={styles.flag}>{countryCodeToFlagEmoji(country.country_code)}</Text>
-                )}
-                <View style={styles.countryText}>
-                  <Text style={[styles.countryName, { color: headingC }]}>{country.title}</Text>
-                  <Text style={[styles.countryCode, { color: subC }]}>{country.country_code}</Text>
-                </View>
-              </View>
-              <View style={styles.countryRight}>
-                <ChevronRightIcon size={20} color={chevron} />
-              </View>
-            </Pressable>
+            />
           ))}
         </View>
       </ScrollView>
     </View>
+  )
+}
+
+function CountryCard({
+  country,
+  headingC,
+  subC,
+  chevron,
+  cardBg,
+  cardBorder,
+  pressedBg,
+  pressedBorder,
+  onPress,
+}: {
+  country: AiraloCatalogCountry
+  headingC: string
+  subC: string
+  chevron: string
+  cardBg: string
+  cardBorder: string
+  pressedBg: string
+  pressedBorder: string
+  onPress: () => void
+}) {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.countryCard,
+        { backgroundColor: cardBg, borderColor: cardBorder },
+        pressed && {
+          backgroundColor: pressedBg,
+          borderColor: pressedBorder,
+        },
+      ]}
+      onPress={onPress}
+    >
+      <View style={styles.countryLeft}>
+        {country.image?.url ? (
+          <Image
+            source={{ uri: country.image.url }}
+            style={styles.thumb}
+            contentFit="cover"
+            accessibilityLabel={country.title}
+          />
+        ) : (
+          <Text style={styles.flag}>{countryCodeToFlagEmoji(country.country_code)}</Text>
+        )}
+        <View style={styles.countryText}>
+          <Text style={[styles.countryName, { color: headingC }]}>{country.title}</Text>
+          <Text style={[styles.countryCode, { color: subC }]}>{country.country_code}</Text>
+        </View>
+      </View>
+      <View style={styles.countryRight}>
+        <ChevronRightIcon size={20} color={chevron} />
+      </View>
+    </Pressable>
   )
 }
 
@@ -133,15 +242,26 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
     marginBottom: 8,
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
   },
-  sub: {
+  subheading: {
     fontSize: 14,
-    marginBottom: 20,
     lineHeight: 20,
+    marginBottom: 14,
+    fontWeight: '500',
+  },
+  searchInput: {
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    fontWeight: '500',
+    marginBottom: 22,
+    outlineColor: 'transparent',
   },
   banner: {
     flexDirection: 'row',
@@ -177,6 +297,12 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+    marginBottom: 20,
+  },
+  sectionHeading: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 12,
   },
   countryCard: {
     flexDirection: 'row',

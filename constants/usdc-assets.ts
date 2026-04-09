@@ -4,3 +4,6 @@ export const USDC_LOGO_URI_DARK =
 
 export const USDC_LOGO_URI_LIGHT =
   'https://static.vecteezy.com/system/resources/previews/044/626/814/non_2x/usdc-logo-on-transparent-background-free-vector.jpg'
+
+/** Solana mainnet USDC mint address. */
+export const USDC_SOLANA_MAINNET_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'

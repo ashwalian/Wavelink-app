@@ -1,3 +1,3 @@
-# Example Expo app with @wallet-ui/react-native-kit
+# Wavelink
 
-This is an example of how to use [`@wallet-ui/react-native-kit`](https://www.npmjs.com/package/@wallet-ui/react-native-kit) with Expo.
+Wavelink is a travel eSIM app for discovering global data plans, managing active and expired eSIMs, and paying with crypto-friendly checkout options.

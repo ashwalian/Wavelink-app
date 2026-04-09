@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myapp",
-    "slug": "myapp",
+    "name": "Wavelink",
+    "slug": "Wavelink",
     "version": "5.37.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

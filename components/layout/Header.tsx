@@ -16,7 +16,7 @@ export function Header() {
   return (
     <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: isDarkMode ? '#0a0a0a' : '#ffffff' }]}>
       <View style={[styles.container, { borderBottomColor: border }]}>
-        <Text style={[styles.logo, { color: fg }]}>Airalo</Text>
+        <Text style={[styles.logo, { color: fg }]}>Wavelink</Text>
         <View style={styles.icons}>
           <Pressable style={[styles.iconButton, { backgroundColor: iconBg }]}>
             <BellIcon size={24} color={fg} />
@@ -46,9 +46,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   logo: {
-    fontSize: 22,
+    fontSize: 19,
     fontWeight: '900',
-    letterSpacing: -0.5,
+    letterSpacing: -0.2,
   },
   icons: {
     flexDirection: 'row',

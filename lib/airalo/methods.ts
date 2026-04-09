@@ -15,6 +15,7 @@ import type {
   AiraloPackagesResponse,
   AiraloRefundReason,
   AiraloRefundRequestResponse,
+  AiraloCompatibleDevicesLiteResponse,
   AiraloSimPackagesResponse,
   AiraloSimTopupsResponse,
   AiraloSimsResponse,
@@ -305,6 +306,20 @@ export function getAiraloFutureOrders(
       to_due_date: params.toDueDate,
       page: params.page,
     },
+    options,
+  )
+}
+
+/**
+ * GET /v2/compatible-devices-lite
+ * Lightweight list to validate eSIM-capable devices.
+ */
+export function getAiraloCompatibleDevicesLite(
+  options?: AiraloRequestOptions,
+): Promise<AiraloCompatibleDevicesLiteResponse> {
+  return airaloPartnersGetJson<AiraloCompatibleDevicesLiteResponse>(
+    '/v2/compatible-devices-lite',
+    undefined,
     options,
   )
 }
